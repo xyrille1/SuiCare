@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "community-food-drive",
+      "description": "Volunteers sorting food donations at a community center.",
+      "imageUrl": "https://images.unsplash.com/photo-1564368587612-f303d38c9063?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tdW5pdHklMjBmb29kfGVufDB8fHx8MTc2OTU3ODA4M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community food"
+    },
+    {
+      "id": "childrens-education-fund",
+      "description": "A young child smiling while reading a book in a classroom.",
+      "imageUrl": "https://images.unsplash.com/photo-1633219664502-f7c0ad898f29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjaGlsZCUyMGVkdWNhdGlvbnxlbnwwfHx8fDE3Njk1NzgwODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "child education"
+    },
+    {
+      "id": "disaster-relief-shelter",
+      "description": "Emergency shelter with supplies for disaster victims.",
+      "imageUrl": "https://images.unsplash.com/photo-1485617359743-4dc5d2e53c89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkaXNhc3RlciUyMHJlbGllZnxlbnwwfHx8fDE3Njk1NDM5MjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "disaster relief"
+    },
+    {
+      "id": "clean-water-project",
+      "description": "A person drinking clean water from a newly installed well.",
+      "imageUrl": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjbGVhbiUyMHdhdGVyfGVufDB8fHx8MTc2OTU1MzQ1MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "clean water"
+    }
+  ]
 }
