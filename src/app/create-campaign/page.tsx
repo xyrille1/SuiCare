@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useCampaigns } from "@/context/campaign-context";
 
 const campaignSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -34,6 +35,7 @@ type CampaignFormValues = z.infer<typeof campaignSchema>;
 export default function CreateCampaignPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const { addCampaign } = useCampaigns();
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(campaignSchema),
@@ -46,18 +48,16 @@ export default function CreateCampaignPage() {
   });
 
   function onSubmit(data: CampaignFormValues) {
-    console.log("New campaign created:", data);
+    addCampaign(data);
     
     toast({
-      title: "Campaign Created (Simulation)",
-      description: "Your new campaign has been created. In a real app, it would now appear on the homepage.",
+      title: "Campaign Created!",
+      description: "Your new campaign is now live on the homepage.",
     });
 
-    // In a real app, you'd save the data and redirect.
-    // For now, we'll just redirect back to the home page after a short delay.
     setTimeout(() => {
       router.push("/");
-    }, 2000);
+    }, 1500);
   }
 
   return (
@@ -139,9 +139,6 @@ export default function CreateCampaignPage() {
                 )}
               />
               <div className="pt-4">
-                <p className="text-sm text-muted-foreground mb-4">
-                  <strong>Note:</strong> This is a prototype. Submitting this form will simulate campaign creation. The campaign will not be permanently saved.
-                </p>
                 <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
                   {form.formState.isSubmitting ? "Creating..." : "Create Campaign"}
