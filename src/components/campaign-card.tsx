@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useSuiClient } from "@mysten/dapp-kit";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -13,6 +15,18 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useCampaigns } from "@/context/campaign-context";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export interface Campaign {
   id: string;
@@ -32,6 +46,7 @@ interface CampaignCardProps {
 
 export function CampaignCard({ campaign, onDonate }: CampaignCardProps) {
   const suiClient = useSuiClient();
+  const { deleteCampaign } = useCampaigns();
   const [liveRaised, setLiveRaised] = useState(campaign.raised);
   const [progress, setProgress] = useState(0);
 
@@ -90,10 +105,34 @@ export function CampaignCard({ campaign, onDonate }: CampaignCardProps) {
             </div>
         </div>
       </CardContent>
-      <CardFooter className="p-6 pt-0">
+      <CardFooter className="p-6 pt-0 flex gap-2">
         <Button className="w-full" variant="default" onClick={() => onDonate(campaign)}>
           Donate Now
         </Button>
+        <Button variant="outline" size="icon" asChild>
+          <Link href={`/edit-campaign/${campaign.id}`}>
+            <Pencil />
+          </Link>
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="icon">
+              <Trash2 />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this campaign.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => deleteCampaign(campaign.id)}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );

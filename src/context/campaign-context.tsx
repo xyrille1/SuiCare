@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { Campaign } from '@/components/campaign-card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -45,11 +45,16 @@ const initialCampaigns: Campaign[] = [
   },
 ];
 
-type NewCampaignData = Omit<Campaign, 'id' | 'imageUrl' | 'imageHint' | 'raised'>;
+export type NewCampaignData = Omit<Campaign, 'id' | 'imageUrl' | 'imageHint' | 'raised'>;
+export type UpdateCampaignData = Pick<Campaign, 'id' | 'title' | 'description' | 'goal' | 'recipientAddress'>;
 
 interface CampaignContextType {
   campaigns: Campaign[];
+  isLoaded: boolean;
   addCampaign: (campaign: NewCampaignData) => void;
+  deleteCampaign: (id: string) => void;
+  updateCampaign: (campaign: UpdateCampaignData) => void;
+  getCampaignById: (id: string) => Campaign | undefined;
 }
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
@@ -95,8 +100,26 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     setCampaigns(prevCampaigns => [newCampaign, ...prevCampaigns]);
   };
 
+  const deleteCampaign = (id: string) => {
+    setCampaigns(prevCampaigns => prevCampaigns.filter(c => c.id !== id));
+  };
+  
+  const updateCampaign = (updatedCampaignData: UpdateCampaignData) => {
+      setCampaigns(prevCampaigns =>
+          prevCampaigns.map(c =>
+              c.id === updatedCampaignData.id ? { ...c, ...updatedCampaignData } : c
+          )
+      );
+  };
+
+  const getCampaignById = useCallback((id: string) => {
+    return campaigns.find(c => c.id === id);
+  }, [campaigns]);
+
+  const value = { campaigns, isLoaded, addCampaign, deleteCampaign, updateCampaign, getCampaignById };
+
   return (
-    <CampaignContext.Provider value={{ campaigns, addCampaign }}>
+    <CampaignContext.Provider value={value}>
       {children}
     </CampaignContext.Provider>
   );
