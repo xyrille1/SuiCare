@@ -13,7 +13,7 @@ const initialCampaigns: Campaign[] = [
     description: "Help us provide essential meals to families in need. Every SUI counts towards a hunger-free community.",
     goal: 50000,
     raised: 0,
-    recipientAddress: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+    recipientAddress: "0x1111111111111111111111111111111111111111111111111111111111111111",
     ...PlaceHolderImages.find(p => p.id === 'community-food-drive')!
   },
   {
@@ -22,7 +22,7 @@ const initialCampaigns: Campaign[] = [
     description: "Support underprivileged children with school supplies and tutoring to unlock their full potential.",
     goal: 75000,
     raised: 0,
-    recipientAddress: "0x2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b",
+    recipientAddress: "0x2222222222222222222222222222222222222222222222222222222222222222",
     ...PlaceHolderImages.find(p => p.id === 'childrens-education-fund')!
   },
   {
@@ -31,7 +31,7 @@ const initialCampaigns: Campaign[] = [
     description: "Provide immediate aid, shelter, and medical supplies to victims of recent natural disasters.",
     goal: 100000,
     raised: 0,
-    recipientAddress: "0x3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c",
+    recipientAddress: "0x3333333333333333333333333333333333333333333333333333333333333333",
     ...PlaceHolderImages.find(p => p.id === 'disaster-relief-shelter')!
   },
     {
@@ -40,7 +40,7 @@ const initialCampaigns: Campaign[] = [
     description: "Fund the construction of wells in remote villages, bringing clean and safe drinking water to hundreds.",
     goal: 25000,
     raised: 0,
-    recipientAddress: "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+    recipientAddress: "0x4444444444444444444444444444444444444444444444444444444444444444",
     ...PlaceHolderImages.find(p => p.id === 'clean-water-project')!
   },
 ];
