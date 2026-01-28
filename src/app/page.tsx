@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CampaignCard, type Campaign } from "@/components/campaign-card";
@@ -70,13 +71,16 @@ export default function Home() {
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
             SuiCare is a peer-to-peer donation platform on the Sui blockchain. Give directly to those in need by connecting your wallet and donating on the testnet.
           </p>
-          <div className="mt-8">
-            <Button size="lg">Explore Campaigns</Button>
+          <div className="mt-8 flex justify-center gap-4">
+            <Button size="lg" asChild><Link href="#campaigns">Explore Campaigns</Link></Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/create-campaign">Create a Campaign</Link>
+            </Button>
           </div>
         </section>
 
         {/* Campaigns and Impact Feed Section */}
-        <section className="container max-w-screen-2xl mx-auto pb-20">
+        <section id="campaigns" className="container max-w-screen-2xl mx-auto pb-20 scroll-mt-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <h2 className="text-3xl font-bold tracking-tight mb-6">Verified Campaigns</h2>
