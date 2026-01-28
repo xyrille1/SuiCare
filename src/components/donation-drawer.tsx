@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Coins, Loader2 } from "lucide-react";
+import { useSignAndExecuteTransactionBlock } from "@mysten/dapp-kit";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +34,7 @@ const donationSchema = z.object({
       required_error: "Please enter an amount.",
       invalid_type_error: "Please enter a valid number.",
     })
-    .min(1, "Donation must be at least 1 SUI to be eligible for gas sponsorship.")
+    .min(0.01, "Donation must be at least 0.01 SUI.")
     .positive("Donation must be a positive number."),
 });
 
@@ -45,9 +46,12 @@ interface DonationDrawerProps {
   campaign: Campaign | null;
 }
 
+// NOTE: This is a mock address. In a real app, each campaign would have its own recipient address.
+const MOCK_CAMPAIGN_RECIPIENT_ADDRESS = "0x2e4f507b5c00a9d020f3a6338b55d283b0922896504a7c06b7b99c7b19a3a14a";
+
 export function DonationDrawer({ open, onOpenChange, campaign }: DonationDrawerProps) {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: signAndExecuteTransactionBlock, isPending } = useSignAndExecuteTransactionBlock();
 
   const form = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
@@ -56,31 +60,55 @@ export function DonationDrawer({ open, onOpenChange, campaign }: DonationDrawerP
     },
   });
 
-  async function onSubmit(data: DonationFormValues) {
-    setIsSubmitting(true);
-    // Simulate API call to sponsored transaction endpoint
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    onOpenChange(false);
-    form.reset();
+  function onSubmit(data: DonationFormValues) {
+    if (!campaign) return;
 
-    toast({
-      title: "Donation Successful!",
-      description: `Thank you for your donation of ${data.amount} SUI. Your Impact Receipt NFT has been minted.`,
-      variant: "default",
-    });
+    const txb = new TransactionBlock();
+    
+    // Note: This is a simple SUI transfer. 1 SUI = 1,000,000,000 MIST.
+    const [coin] = txb.splitCoins(txb.gas, [txb.pure(data.amount * 1_000_000_000)]);
+    txb.transferObjects([coin], txb.pure(MOCK_CAMPAIGN_RECIPIENT_ADDRESS));
+
+    signAndExecuteTransactionBlock(
+      {
+        transactionBlock: txb,
+        options: {
+          showEffects: true,
+        },
+      },
+      {
+        onSuccess: (result) => {
+          onOpenChange(false);
+          form.reset();
+          toast({
+            title: "Donation Successful!",
+            description: `Thank you for your donation of ${data.amount} SUI. Digest: ${result.digest.slice(0,10)}...`,
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Donation Failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        },
+      }
+    );
   }
 
   if (!campaign) return null;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+      if (!isPending) {
+        onOpenChange(isOpen);
+      }
+    }}>
       <SheetContent className="sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Donate to {campaign.title}</SheetTitle>
           <SheetDescription>
-            Your donation is processed gas-free. 100% of your SUI goes directly to the cause.
+            Your donation is processed on the Sui testnet. 100% of your SUI goes directly to the cause.
           </SheetDescription>
         </SheetHeader>
         <div className="py-8">
@@ -99,15 +127,15 @@ export function DonationDrawer({ open, onOpenChange, campaign }: DonationDrawerP
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Minimum donation of 1 SUI is required.
+                      You are on the Sui Testnet.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? "Processing..." : `Donate ${form.watch("amount") || 0} SUI`}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isPending ? "Processing..." : `Donate ${form.watch("amount") || 0} SUI`}
               </Button>
             </form>
           </Form>

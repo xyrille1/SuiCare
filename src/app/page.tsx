@@ -64,7 +64,7 @@ export default function Home() {
             Transparent Giving, Zero Fees.
           </h1>
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
-            SuiCare is a peer-to-peer donation platform on the Sui blockchain. Give directly to those in need with just your Google account, completely gas-free.
+            SuiCare is a peer-to-peer donation platform on the Sui blockchain. Give directly to those in need by connecting your wallet and donating on the testnet.
           </p>
           <div className="mt-8">
             <Button size="lg">Explore Campaigns</Button>
