@@ -13,7 +13,7 @@ const initialCampaigns: Campaign[] = [
     description: "Help us provide essential meals to families in need. Every SUI counts towards a hunger-free community.",
     goal: 50000,
     raised: 32540,
-    recipientAddress: "0x71859530b57c519ab3de63d7d0fd10eb16cb651fc554a2a337ce199361625ac6",
+    recipientAddress: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
     ...PlaceHolderImages.find(p => p.id === 'community-food-drive')!
   },
   {
@@ -22,7 +22,7 @@ const initialCampaigns: Campaign[] = [
     description: "Support underprivileged children with school supplies and tutoring to unlock their full potential.",
     goal: 75000,
     raised: 21880,
-    recipientAddress: "0x71859530b57c519ab3de63d7d0fd10eb16cb651fc554a2a337ce199361625ac6",
+    recipientAddress: "0x2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b",
     ...PlaceHolderImages.find(p => p.id === 'childrens-education-fund')!
   },
   {
@@ -31,7 +31,7 @@ const initialCampaigns: Campaign[] = [
     description: "Provide immediate aid, shelter, and medical supplies to victims of recent natural disasters.",
     goal: 100000,
     raised: 89210,
-    recipientAddress: "0x71859530b57c519ab3de63d7d0fd10eb16cb651fc554a2a337ce199361625ac6",
+    recipientAddress: "0x3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c",
     ...PlaceHolderImages.find(p => p.id === 'disaster-relief-shelter')!
   },
     {
@@ -40,7 +40,7 @@ const initialCampaigns: Campaign[] = [
     description: "Fund the construction of wells in remote villages, bringing clean and safe drinking water to hundreds.",
     goal: 25000,
     raised: 11300,
-    recipientAddress: "0x71859530b57c519ab3de63d7d0fd10eb16cb651fc554a2a337ce199361625ac6",
+    recipientAddress: "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
     ...PlaceHolderImages.find(p => p.id === 'clean-water-project')!
   },
 ];
@@ -60,7 +60,7 @@ interface CampaignContextType {
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
 
 export function CampaignProvider({ children }: { children: ReactNode }) {
-  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from localStorage on mount (client-side only)
@@ -69,9 +69,12 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       const storedCampaigns = localStorage.getItem(CAMPAIGNS_STORAGE_KEY);
       if (storedCampaigns) {
         setCampaigns(JSON.parse(storedCampaigns));
+      } else {
+        setCampaigns(initialCampaigns);
       }
     } catch (error) {
       console.error("Failed to parse campaigns from localStorage", error);
+      setCampaigns(initialCampaigns);
     } finally {
       setIsLoaded(true);
     }
@@ -80,10 +83,13 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
   // Save to localStorage whenever campaigns change, but only after initial load
   useEffect(() => {
     if (isLoaded) {
-      try {
-        localStorage.setItem(CAMPAIGNS_STORAGE_KEY, JSON.stringify(campaigns));
-      } catch (error) {
-        console.error("Failed to save campaigns to localStorage", error);
+      // A simple check to see if we're different from the initial hardcoded data
+      if (JSON.stringify(campaigns) !== JSON.stringify(initialCampaigns) || campaigns.length !== initialCampaigns.length) {
+        try {
+          localStorage.setItem(CAMPAIGNS_STORAGE_KEY, JSON.stringify(campaigns));
+        } catch (error) {
+          console.error("Failed to save campaigns to localStorage", error);
+        }
       }
     }
   }, [campaigns, isLoaded]);
