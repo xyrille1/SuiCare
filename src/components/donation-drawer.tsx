@@ -46,9 +46,6 @@ interface DonationDrawerProps {
   campaign: Campaign | null;
 }
 
-// NOTE: This is a mock address. In a real app, each campaign would have its own recipient address.
-const MOCK_CAMPAIGN_RECIPIENT_ADDRESS = "0x2e4f507b5c00a9d020f3a6338b55d283b0922896504a7c06b7b99c7b19a3a14a";
-
 export function DonationDrawer({ open, onOpenChange, campaign }: DonationDrawerProps) {
   const { toast } = useToast();
   const { mutate: signAndExecuteTransactionBlock, isPending } = useSignAndExecuteTransactionBlock();
@@ -67,7 +64,7 @@ export function DonationDrawer({ open, onOpenChange, campaign }: DonationDrawerP
     
     // Note: This is a simple SUI transfer. 1 SUI = 1,000,000,000 MIST.
     const [coin] = txb.splitCoins(txb.gas, [txb.pure(data.amount * 1_000_000_000)]);
-    txb.transferObjects([coin], txb.pure(MOCK_CAMPAIGN_RECIPIENT_ADDRESS));
+    txb.transferObjects([coin], txb.pure(campaign.recipientAddress));
 
     signAndExecuteTransactionBlock(
       {

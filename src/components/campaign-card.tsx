@@ -21,6 +21,7 @@ export interface Campaign {
   raised: number;
   imageUrl: string;
   imageHint: string;
+  recipientAddress: string;
 }
 
 interface CampaignCardProps {
