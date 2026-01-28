@@ -44,6 +44,12 @@ export default function EditCampaignPage() {
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(campaignSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      goal: 0,
+      recipientAddress: "",
+    },
   });
 
   useEffect(() => {
