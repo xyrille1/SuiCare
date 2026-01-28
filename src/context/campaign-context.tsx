@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Campaign } from '@/components/campaign-card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const CAMPAIGNS_STORAGE_KEY = 'suicare-campaigns';
 
 const initialCampaigns: Campaign[] = [
   {
@@ -54,6 +56,32 @@ const CampaignContext = createContext<CampaignContextType | undefined>(undefined
 
 export function CampaignProvider({ children }: { children: ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load from localStorage on mount (client-side only)
+  useEffect(() => {
+    try {
+      const storedCampaigns = localStorage.getItem(CAMPAIGNS_STORAGE_KEY);
+      if (storedCampaigns) {
+        setCampaigns(JSON.parse(storedCampaigns));
+      }
+    } catch (error) {
+      console.error("Failed to parse campaigns from localStorage", error);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // Save to localStorage whenever campaigns change, but only after initial load
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(CAMPAIGNS_STORAGE_KEY, JSON.stringify(campaigns));
+      } catch (error) {
+        console.error("Failed to save campaigns to localStorage", error);
+      }
+    }
+  }, [campaigns, isLoaded]);
 
   const addCampaign = (newCampaignData: NewCampaignData) => {
     const randomImage = PlaceHolderImages[Math.floor(Math.random() * PlaceHolderImages.length)];
