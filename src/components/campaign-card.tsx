@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSuiClient } from "@mysten/dapp-kit";
 import {
   Card,
   CardContent,
@@ -30,12 +31,38 @@ interface CampaignCardProps {
 }
 
 export function CampaignCard({ campaign, onDonate }: CampaignCardProps) {
+  const suiClient = useSuiClient();
+  const [liveRaised, setLiveRaised] = useState(campaign.raised);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgress((campaign.raised / campaign.goal) * 100), 500);
+    const timer = setTimeout(() => setProgress((liveRaised / campaign.goal) * 100), 500);
     return () => clearTimeout(timer);
-  }, [campaign.raised, campaign.goal]);
+  }, [liveRaised, campaign.goal]);
+
+  useEffect(() => {
+    async function fetchBalance() {
+      if (campaign.recipientAddress) {
+        try {
+          const { totalBalance } = await suiClient.getBalance({
+            owner: campaign.recipientAddress,
+          });
+          // Balance is in MIST, convert to SUI
+          const suiBalance = parseInt(totalBalance, 10) / 1_000_000_000;
+          setLiveRaised(suiBalance);
+        } catch (error) {
+          console.error(`Failed to fetch balance for ${campaign.recipientAddress}:`, error);
+          // If fetching fails, we'll just stick with the initial mock amount which is already set
+        }
+      }
+    }
+
+    fetchBalance();
+    const interval = setInterval(fetchBalance, 15000); // Refresh every 15 seconds
+
+    return () => clearInterval(interval);
+  }, [suiClient, campaign.recipientAddress]);
+
 
   return (
     <Card className="glassmorphic-card w-full overflow-hidden flex flex-col">
@@ -58,7 +85,7 @@ export function CampaignCard({ campaign, onDonate }: CampaignCardProps) {
         <div className="space-y-2">
             <Progress value={progress} className="h-2" />
             <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Raised: {new Intl.NumberFormat().format(campaign.raised)} SUI</span>
+                <span>Raised: {new Intl.NumberFormat().format(liveRaised)} SUI</span>
                 <span>Goal: {new Intl.NumberFormat().format(campaign.goal)} SUI</span>
             </div>
         </div>
