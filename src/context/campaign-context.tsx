@@ -12,7 +12,7 @@ const initialCampaigns: Campaign[] = [
     title: "Community Food Drive",
     description: "Help us provide essential meals to families in need. Every SUI counts towards a hunger-free community.",
     goal: 50000,
-    raised: 32540,
+    raised: 0,
     recipientAddress: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
     ...PlaceHolderImages.find(p => p.id === 'community-food-drive')!
   },
@@ -21,7 +21,7 @@ const initialCampaigns: Campaign[] = [
     title: "Children's Education Fund",
     description: "Support underprivileged children with school supplies and tutoring to unlock their full potential.",
     goal: 75000,
-    raised: 21880,
+    raised: 0,
     recipientAddress: "0x2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b",
     ...PlaceHolderImages.find(p => p.id === 'childrens-education-fund')!
   },
@@ -30,7 +30,7 @@ const initialCampaigns: Campaign[] = [
     title: "Emergency Disaster Relief",
     description: "Provide immediate aid, shelter, and medical supplies to victims of recent natural disasters.",
     goal: 100000,
-    raised: 89210,
+    raised: 0,
     recipientAddress: "0x3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c",
     ...PlaceHolderImages.find(p => p.id === 'disaster-relief-shelter')!
   },
@@ -39,7 +39,7 @@ const initialCampaigns: Campaign[] = [
     title: "Clean Water Project",
     description: "Fund the construction of wells in remote villages, bringing clean and safe drinking water to hundreds.",
     goal: 25000,
-    raised: 11300,
+    raised: 0,
     recipientAddress: "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
     ...PlaceHolderImages.find(p => p.id === 'clean-water-project')!
   },
