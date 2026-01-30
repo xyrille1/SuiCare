@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ConnectButton } from "@mysten/dapp-kit";
 import { Logo } from "@/components/icons/logo";
+import { WalletIndicator } from "@/components/wallet-indicator";
+import { LoginButton } from "@/components/login-button";
 import { GaslessModeIndicator } from "@/components/icons/zero-g-indicator";
+
 
 export function Header() {
   return (
@@ -14,14 +16,15 @@ export function Header() {
           <span className="font-bold text-lg">SuiCare</span>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium text-muted-foreground ml-10">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground ml-10">
           <GaslessModeIndicator />
           <Link href="#campaigns" className="transition-colors hover:text-foreground">Campaigns</Link>
           <Link href="#" className="transition-colors hover:text-foreground">Activity</Link>
         </nav>
 
-        <div className="ml-auto">
-          <ConnectButton className="!bg-gray-900 !text-white !font-semibold !rounded-lg" />
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <WalletIndicator />
+          <LoginButton />
         </div>
       </div>
     </header>
