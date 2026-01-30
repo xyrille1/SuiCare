@@ -5,6 +5,8 @@ import { BookOpen, Droplet, HeartHandshake, Package, LucideProps } from "lucide-
 import React from 'react';
 
 const CAMPAIGNS_STORAGE_KEY = 'suicare-campaigns';
+export const ADMIN_ADDRESS = "0x71859530b57c519ab3de63d7d0fd10eb16cb651fc554a2a337ce199361625ac6";
+
 
 export interface Campaign {
   id: string;
@@ -73,12 +75,15 @@ const initialCampaigns: Campaign[] = [
 ];
 
 export type NewCampaignData = Omit<Campaign, 'id' | 'raised' | 'icon' | 'color' | 'iconColor'>;
+export type UpdateCampaignData = Omit<Campaign, 'raised' | 'icon' | 'color' | 'iconColor'>;
 
 interface CampaignContextType {
   campaigns: Campaign[];
   isLoaded: boolean;
   addCampaign: (campaign: NewCampaignData) => void;
   getCampaignById: (id: string) => Campaign | undefined;
+  updateCampaign: (campaign: UpdateCampaignData) => void;
+  deleteCampaign: (id: string) => void;
 }
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
@@ -130,11 +135,30 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     setCampaigns(prevCampaigns => [newCampaign, ...prevCampaigns]);
   };
 
+  const updateCampaign = (updatedCampaignData: UpdateCampaignData) => {
+    setCampaigns(prevCampaigns =>
+      prevCampaigns.map(c => {
+        if (c.id === updatedCampaignData.id) {
+          return {
+            ...c,
+            ...updatedCampaignData,
+          };
+        }
+        return c;
+      })
+    );
+  };
+  
+  const deleteCampaign = (id: string) => {
+    setCampaigns(prevCampaigns => prevCampaigns.filter(c => c.id !== id));
+  };
+
+
   const getCampaignById = useCallback((id: string) => {
     return campaigns.find(c => c.id === id);
   }, [campaigns]);
 
-  const value = { campaigns, isLoaded, addCampaign, getCampaignById };
+  const value = { campaigns, isLoaded, addCampaign, getCampaignById, updateCampaign, deleteCampaign };
 
   return (
     <CampaignContext.Provider value={value}>
