@@ -9,13 +9,14 @@ import { DonationDrawer } from "@/components/donation-drawer";
 import { ImpactFeed } from "@/components/impact-feed";
 import { Button } from "@/components/ui/button";
 import { useCampaigns } from "@/context/campaign-context";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const { campaigns } = useCampaigns();
 
-  const handleDonateClick = (campaign: Campaign) => {
+  const handleCardClick = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     setDrawerOpen(true);
   };
@@ -25,35 +26,46 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 text-center container">
-          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary">
-            Transparent Giving, Zero Fees.
+        <section className="py-24 sm:py-32 text-center container">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
+            Transparent Giving, <span className="text-primary">Zero Fees.</span>
           </h1>
-          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
+          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed mt-6">
             SuiCare is a peer-to-peer donation platform on the Sui blockchain. Give directly to those in need by connecting your wallet and donating on the testnet.
           </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Button size="lg" asChild><Link href="#campaigns">Explore Campaigns</Link></Button>
-            <Button size="lg" variant="outline" asChild>
+          <div className="mt-10 flex justify-center gap-4">
+            <Button size="lg" asChild className="rounded-full">
+              <Link href="#campaigns">
+                Explore Campaigns
+                <ArrowRight />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild className="rounded-full">
               <Link href="/create-campaign">Create a Campaign</Link>
             </Button>
           </div>
         </section>
 
         {/* Campaigns and Impact Feed Section */}
-        <section id="campaigns" className="container max-w-screen-2xl mx-auto pb-20 scroll-mt-20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-bold tracking-tight mb-6">Verified Campaigns</h2>
+        <section id="campaigns" className="container max-w-screen-xl mx-auto pb-20 scroll-mt-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold">Verified Campaigns</h2>
+                <Link href="#" className="text-sm font-semibold text-primary hover:underline">
+                  View all
+                </Link>
+              </div>
               <div className="grid sm:grid-cols-2 gap-6">
                 {campaigns.map((campaign) => (
-                  <CampaignCard key={campaign.id} campaign={campaign} onDonate={handleDonateClick} />
+                  <CampaignCard key={campaign.id} campaign={campaign} onClick={handleCardClick} />
                 ))}
               </div>
             </div>
-            <div className="lg:col-span-1">
-              <h2 className="text-3xl font-bold tracking-tight mb-6">Live Activity</h2>
-              <ImpactFeed />
+            <div className="lg:col-span-4">
+              <div className="sticky top-28">
+                 <ImpactFeed />
+              </div>
             </div>
           </div>
         </section>
