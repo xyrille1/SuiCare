@@ -28,10 +28,10 @@ export default function Home() {
         {/* Hero Section */}
         <section className="py-24 sm:py-32 text-center container">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
-            Transparent Giving, <span className="text-primary">Zero Fees.</span>
+            Transparent Giving: See exactly where your impact goes.
           </h1>
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed mt-6">
-            SuiCare is a peer-to-peer donation platform on the Sui blockchain. Give directly to those in need by connecting your wallet and donating on the testnet.
+            Stop wondering where your donations land. We’ve stripped away the overhead and the guesswork to give you a direct line to the causes you care about. From the moment you give to the second your contribution makes a difference, you’ll see the real-world results of your generosity in real time. No filters, no mystery—just pure impact. 
           </p>
           <div className="mt-10 flex justify-center gap-4">
             <Button size="lg" asChild className="rounded-full">
