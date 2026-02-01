@@ -3,8 +3,6 @@ import { SuiObjectData } from '@mysten/sui.js/client';
 import { useQuery } from '@tanstack/react-query';
 import { TransactionHistoryUI } from './ui/transaction-history';
 
-const SUI_CARE_PACKAGE_ID = '0xYOUR_PACKAGE_ID'; // Replace with your package ID
-
 export function TransactionHistory({ campaignId }: { campaignId: string }) {
   const suiClient = useSuiClient();
   const { network } = useSuiClientContext();
@@ -18,11 +16,22 @@ export function TransactionHistory({ campaignId }: { campaignId: string }) {
 
       const donationIds = data.map((field) => field.objectId);
 
-      return suiClient.multiGetObjects({
+      if (donationIds.length === 0) {
+        return [];
+      }
+
+      const donations = await suiClient.multiGetObjects({
         ids: donationIds,
         options: { showContent: true },
       });
+
+      // Filter out any errored or non-existent objects and return the data
+      return donations
+        .filter((donation) => donation.data)
+        .map((donation) => donation.data as SuiObjectData);
     },
+    enabled: !!campaignId, // only run the query if campaignId is available
+    refetchInterval: 5000, // Poll for new data every 5 seconds
   });
 
   return (
