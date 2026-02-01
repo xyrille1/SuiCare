@@ -47,7 +47,7 @@ export default function Home() {
         </section>
 
         {/* Campaigns and Impact Feed Section */}
-        <section id="campaigns" className="container max-w-screen-xl mx-auto pb-20 scroll-mt-20">
+        <section id="campaigns" className="container max-w-screen-lg mx-auto pb-20 scroll-mt-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8">
               <div className="flex items-center justify-between mb-8">
