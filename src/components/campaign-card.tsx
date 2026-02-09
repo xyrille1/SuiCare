@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from "react";
 import Link from 'next/link';
@@ -20,23 +20,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import type { LucideProps } from "lucide-react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useCampaigns, ADMIN_ADDRESS } from "@/context/campaign-context";
-import { useToast } from "@/hooks/use-toast";
-
-export interface Campaign {
-  id: string;
-  title: string;
-  description: string;
-  goal: number;
-  raised: number;
-  recipientAddress: string;
-  icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
-  color: string;
-  iconColor: string;
-}
+import { Campaign } from "@/lib/types";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -51,20 +38,15 @@ const VerifiedBadge = () => (
 
 export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   const currentAccount = useCurrentAccount();
-  const { deleteCampaign } = useCampaigns();
-  const { toast } = useToast();
+  const { deleteCampaign, isPending } = useCampaigns();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const isAdmin = currentAccount?.address === ADMIN_ADDRESS;
 
   const handleDelete = () => {
-    deleteCampaign(campaign.id);
-    toast({
-      title: "Campaign Deleted",
-      description: `The "${campaign.title}" campaign has been removed.`,
-      variant: "destructive",
+    deleteCampaign(campaign.id, () => {
+        setIsDeleteDialogOpen(false);
     });
-    setIsDeleteDialogOpen(false);
   }
   
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
@@ -123,8 +105,8 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Delete
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90" disabled={isPending}>
+              {isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

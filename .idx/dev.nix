@@ -7,6 +7,9 @@
   packages = [
     pkgs.nodejs_20
     pkgs.zulu
+    pkgs.sudo
+    pkgs.curl
+    pkgs.wget
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -36,7 +39,8 @@
       previews = {
         web = {
           command = ["npm" "run" "dev" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
-          manager = "web";
+          manager = "web"; 
+          
         };
       };
     };

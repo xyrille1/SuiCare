@@ -13,10 +13,12 @@ This project was built to demonstrate key concepts of dApp development on the Su
 -   **Admin-Verified Campaigns**: Campaigns are managed by a designated admin wallet.
 -   **Persistent State**: Campaigns are saved in the browser's local storage.
 -   **Real-time Impact Feed**: A live ticker provides transparency on donation activity.
+-   **AI-Powered Donation Suggestions**: Genkit and Gemini provide users with intelligent donation amount suggestions.
 
 ## Technical Stack
 
 -   **Framework**: Next.js
+-   **AI**: Genkit & Google Gemini
 -   **Blockchain**: Sui
 -   **Styling**: Tailwind CSS
 -   **UI Components**: Shadcn UI
