@@ -3,30 +3,84 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { CampaignCard, type Campaign } from '@/components/campaign-card';
+import { CampaignCard } from '@/components/campaign-card';
+import type { Campaign } from '@/lib/types';
 import { DonationDrawer } from '@/components/donation-drawer';
 import { ImpactFeed } from '@/components/impact-feed';
 import { Button } from '@/components/ui/button';
 import { useCampaigns } from '@/context/campaign-context';
-import { Zap, Heart } from 'lucide-react';
+import { Zap, Heart, Loader2, PlusCircle, AlertTriangle } from 'lucide-react';
+import { useCurrentAccount } from '@mysten/dapp-kit';
+
+const ADMIN_ADDRESS = process.env.NEXT_PUBLIC_SUI_ADMIN_ADDRESS!;
 
 export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(
     null
   );
-  const { campaigns } = useCampaigns();
+  const { campaigns, isLoaded, error } = useCampaigns();
+  const currentAccount = useCurrentAccount();
 
   const handleCardClick = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     setDrawerOpen(true);
   };
 
+  const renderCampaigns = () => {
+    if (error) {
+      return (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-red-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Data Fetching Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (!isLoaded) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      );
+    }
+
+    if (campaigns.length === 0) {
+        return (
+          <div className="text-center bg-gray-50 rounded-lg p-8">
+            <h3 className="text-xl font-semibold mb-2">No Campaigns Yet</h3>
+            <p className="text-gray-500 mb-4">Be the first to create a campaign and start making a difference!</p>
+            <Button asChild>
+              <Link href="/create-campaign">Create a Campaign</Link>
+            </Button>
+          </div>
+        );
+      }
+
+    return (
+      <div className="grid sm:grid-cols-2 gap-6">
+        {campaigns.map((campaign) => (
+          <CampaignCard
+            key={campaign.id}
+            campaign={campaign}
+            onClick={handleCardClick}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <>
-      <Header />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-white via-white to-[#F0FAF9]">
@@ -103,24 +157,31 @@ export default function Home() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold">Verified Campaigns</h2>
-                <Link
-                  href="#"
-                  className="text-sm font-semibold text-primary hover:underline"
-                >
-                  View all
-                </Link>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-6">
-                {campaigns.map((campaign) => (
-                  <CampaignCard
-                    key={campaign.id}
-                    campaign={campaign}
-                    onClick={handleCardClick}
-                  />
-                ))}
-              </div>
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-2xl font-bold">
+                        Verified Campaigns
+                        {isLoaded && campaigns.length > 0 && (
+                            <span className="text-gray-500 font-light ml-2">({campaigns.length})</span>
+                        )}
+                    </h2>
+                    <div className="flex items-center space-x-4">
+                        {currentAccount && currentAccount.address === ADMIN_ADDRESS && (
+                            <Button variant="outline" asChild>
+                                <Link href={{ pathname: '/add-milestone', query: { campaignId: campaigns[0]?.id } }} className="flex items-center gap-2">
+                                    <PlusCircle size={16} />
+                                    Add Milestone
+                                </Link>
+                            </Button>
+                        )}
+                        <Link
+                        href="#campaigns"
+                        className="text-sm font-semibold text-primary hover:underline"
+                        >
+                        View all
+                        </Link>
+                    </div>
+                </div>
+              {renderCampaigns()}
             </div>
             <div className="lg:col-span-4">
               <div className="sticky top-28">
@@ -130,7 +191,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <Footer />
       <DonationDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}

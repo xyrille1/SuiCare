@@ -1,30 +1,34 @@
-import type {Metadata} from 'next';
-import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
+
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "@mysten/dapp-kit/dist/index.css";
+import "./globals.css";
 import { AppProviders } from "@/components/app-providers";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'SuiCare - Gasless Donations',
-  description: 'A transparent, gasless, and peer-to-peer donation platform built on the Sui blockchain.',
+  title: "SuiCare - Decentralized Fundraising",
+  description: "Create and donate to fundraising campaigns on the Sui blockchain.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }> ) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">
+      <body className={`${inter.className} bg-muted/20`}>
         <AppProviders>
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </AppProviders>
-        <Toaster />
       </body>
     </html>
   );
