@@ -1,0 +1,16 @@
+Core Features:
+
+- zkLogin Integration: Sign in with Google.
+- Gasless Donations: A conceptual "Gas Station" sponsors user transactions.
+- Admin-Verified Campaigns: Campaigns are managed by a designated admin wallet.
+- Persistent State: Campaigns are saved in the browser's local storage.
+- Real-time Impact Feed: A live ticker provides transparency on donation activity.
+- AI-Powered Donation Suggestions: Genkit and Gemini provide users with intelligent donation amount suggestions.
+
+Future Enhancements:
+
+- Implementation of on-chain smart contracts to manage campaign logic and fund distribution.
+- A dedicated dashboard for NGOs to track the performance of their campaigns.
+- Detailed donation history for users.
+- Implementation of Donation Claim Links for victims without wallets.
+- Integration of Genkit for AI features, such as generating campaign descriptions or suggesting causes.
