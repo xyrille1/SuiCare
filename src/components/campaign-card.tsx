@@ -24,6 +24,7 @@ import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useCampaigns, ADMIN_ADDRESS } from "@/context/campaign-context";
 import { Campaign } from "@/lib/types";
+import { Progress } from "@/components/ui/progress";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -50,6 +51,10 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   }
   
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+
+  const MIST_PER_SUI = 1_000_000_000;
+  const raisedInSui = Number(campaign.raised) / MIST_PER_SUI;
+  const fundingPercentage = (raisedInSui / Number(campaign.goal)) * 100;
 
   return (
     <>
@@ -91,6 +96,13 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
           <div className="p-6">
             <CardTitle className="text-xl">{campaign.title}</CardTitle>
             <CardDescription className="pt-2 line-clamp-2">{campaign.description}</CardDescription>
+            <div className="pt-4">
+              <Progress value={fundingPercentage} className="h-2" />
+              <div className="flex justify-between items-center pt-2">
+                <p className="text-sm font-semibold">${raisedInSui.toLocaleString()} <span className="text-muted-foreground font-normal">raised</span></p>
+                <p className="text-sm text-muted-foreground"><span className="font-semibold">${Number(campaign.goal).toLocaleString()}</span> goal</p>
+              </div>
+            </div>
           </div>
         </CardHeader>
       </Card>
