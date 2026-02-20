@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { ADMIN_ADDRESS } from "@/context/campaign-context";
 
 type ActivityFilter = "all" | "donations" | "milestones" | "admin";
 
@@ -156,6 +157,8 @@ export default function ActivityPage() {
   const currentAccount = useCurrentAccount();
   const { network } = useSuiClientContext();
   const suiClient = useSuiClient();
+  const isConfiguredAdmin =
+    currentAccount?.address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
   const { data, isLoading, isError } = useQuery<ActivityItem[], Error>({
     queryKey: ["activity", SUI_PACKAGE_ID, network],
@@ -224,12 +227,14 @@ export default function ActivityPage() {
         >
           Milestones
         </Button>
-        <Button
-          variant={filter === "admin" ? "default" : "outline"}
-          onClick={() => setFilter("admin")}
-        >
-          Admin Actions
-        </Button>
+        {isConfiguredAdmin && (
+          <Button
+            variant={filter === "admin" ? "default" : "outline"}
+            onClick={() => setFilter("admin")}
+          >
+            Admin Actions
+          </Button>
+        )}
         <Button
           variant={showMineOnly ? "default" : "outline"}
           onClick={() => setShowMineOnly((prev) => !prev)}

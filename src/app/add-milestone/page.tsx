@@ -22,10 +22,12 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
+  useCurrentAccount,
   useSignAndExecuteTransactionBlock,
   useSuiClient,
 } from "@mysten/dapp-kit";
 import { toast } from "@/hooks/use-toast";
+import { ADMIN_ADDRESS } from "@/context/campaign-context";
 
 const SUI_PACKAGE_ID = process.env.NEXT_PUBLIC_SUI_PACKAGE_ID!;
 const SUI_CAMPAIGNS_ID = process.env.NEXT_PUBLIC_SUI_CAMPAIGNS_ID!;
@@ -62,6 +64,7 @@ function AddMilestonePageContent() {
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaignId");
   const suiClient = useSuiClient();
+  const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
 
   const form = useForm<MilestoneFormValues>({
@@ -77,6 +80,24 @@ function AddMilestonePageContent() {
       toast({
         title: "Error",
         description: "Campaign ID is missing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!currentAccount) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentAccount.address.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+      toast({
+        title: "Unauthorized",
+        description: "Only the configured admin address can add milestones.",
         variant: "destructive",
       });
       return;
