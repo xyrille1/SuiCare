@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -32,6 +32,8 @@ import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useCampaigns } from "@/context/campaign-context";
 import { Campaign } from "@/lib/types";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { getCampaignStatus } from "@/lib/campaign-status";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -48,10 +50,16 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   const currentAccount = useCurrentAccount();
   const { deleteCampaign, isPending } = useCampaigns();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // --- LOGIC ---
   // 1. Check if current user is the admin
-  const isCampaignAdmin = currentAccount?.address === campaign.admin;
+  const isCampaignAdmin =
+    isClient && currentAccount?.address === campaign.admin;
 
   // 2. Check logic constraints
   const canEdit = campaign.totalReleased === 0;
@@ -72,7 +80,18 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
 
   const MIST_PER_SUI = 1_000_000_000;
   const raisedInSui = Number(campaign.raised) / MIST_PER_SUI;
-  const fundingPercentage = (raisedInSui / Number(campaign.goal)) * 100;
+  const goalInSui = Number(campaign.goal);
+  const fundingPercentage = goalInSui > 0 ? (raisedInSui / goalInSui) * 100 : 0;
+  const status = campaign.status ?? getCampaignStatus(campaign);
+
+  const statusVariant =
+    status === "Completed"
+      ? "default"
+      : status === "Funded"
+        ? "secondary"
+        : "outline";
+
+  if (!isClient) return null;
 
   return (
     <>
@@ -91,7 +110,7 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
 
             {/* --- KEBAB MENU (Top Right) --- */}
             {/* Only visible to the Admin */}
-            {isCampaignAdmin && (
+            {isCampaignAdmin ? (
               <div
                 className="absolute top-3 right-3 z-20"
                 onClick={stopPropagation}
@@ -143,7 +162,7 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-            )}
+            ) : null}
 
             {/* Icon Rendering */}
             {campaign.icon ? (
@@ -163,14 +182,27 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
             <CardTitle className="text-xl">
               {campaign.name || campaign.title || "Untitled Campaign"}
             </CardTitle>
+            <div className="pt-2">
+              <Badge variant={statusVariant}>{status}</Badge>
+            </div>
             <CardDescription className="pt-2 line-clamp-2 min-h-[40px]">
               {campaign.description}
             </CardDescription>
             <div className="pt-4">
               <Progress value={fundingPercentage} className="h-2" />
               <div className="flex justify-between items-center pt-2">
-                <p className="text-sm font-semibold">${raisedInSui.toLocaleString()} <span className="text-muted-foreground font-normal">raised</span></p>
-                <p className="text-sm text-muted-foreground"><span className="font-semibold">${Number(campaign.goal).toLocaleString()}</span> goal</p>
+                <p className="text-sm font-semibold">
+                  ${raisedInSui.toLocaleString()}{" "}
+                  <span className="text-muted-foreground font-normal">
+                    raised
+                  </span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold">
+                    ${Number(campaign.goal).toLocaleString()}
+                  </span>{" "}
+                  goal
+                </p>
               </div>
             </div>
           </div>

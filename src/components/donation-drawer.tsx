@@ -33,6 +33,7 @@ import {
 import { useCampaigns } from "@/context/campaign-context";
 import { Campaign } from "@/lib/types";
 import { getDonationSuggestions } from "@/app/actions";
+import { getCampaignStatus } from "@/lib/campaign-status";
 
 const donationSchema = z.object({
   amount: z.coerce
@@ -45,18 +46,6 @@ const donationSchema = z.object({
 });
 
 type DonationFormValues = z.infer<typeof donationSchema>;
-
-// FIX 1: Define an extended type that includes the missing properties.
-// We use '&' to safely extend it whether 'Campaign' is a type or an interface.
-type ExtendedCampaign = Campaign & {
-  goal: number;
-  milestones: {
-    percentage: number;
-    status: number;
-  }[];
-  recipientAddress: string;
-  adminAddress: string;
-};
 
 interface DonationDrawerProps {
   open: boolean;
@@ -75,10 +64,10 @@ export function DonationDrawer({
   const [suggestions, setSuggestions] = useState<number[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
-  // FIX 2: Cast the retrieved campaign to our ExtendedCampaign type
-  const campaign = initialCampaign
-    ? (getCampaignById(initialCampaign.id) as ExtendedCampaign)
-    : null;
+  const campaign = initialCampaign ? getCampaignById(initialCampaign.id) : null;
+  const campaignStatus = campaign ? getCampaignStatus(campaign) : null;
+  const donationsDisabled =
+    campaignStatus === "Funded" || campaignStatus === "Completed";
 
   const form = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
@@ -92,7 +81,6 @@ export function DonationDrawer({
       form.reset({ amount: 10 });
       setLoadingSuggestions(true);
 
-      // FIX 3: Add nullish coalescing (?? "") to handle potential undefined strings
       getDonationSuggestions({
         title: campaign.title ?? "Campaign",
         description: campaign.description ?? "",
@@ -196,14 +184,26 @@ export function DonationDrawer({
                     </div>
                   )
                 )}
-                <Button type="submit" className="w-full" disabled={isPending}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPending || donationsDisabled}
+                >
                   {isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   {isPending
                     ? "Processing..."
-                    : `Donate ${form.watch("amount") || 0} SUI`}
+                    : donationsDisabled
+                      ? "Goal Reached"
+                      : `Donate ${form.watch("amount") || 0} SUI`}
                 </Button>
+                {donationsDisabled && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    This campaign is fully funded. Next step is milestone
+                    request and admin verification.
+                  </p>
+                )}
               </form>
             </Form>
           </div>
@@ -227,11 +227,11 @@ export function DonationDrawer({
               })}
             </div>
           )}
-          {currentAccount?.address === campaign.adminAddress && (
+          {currentAccount?.address === campaign.admin && (
             <AdminVerificationPanel
               campaignId={campaign.id}
               milestones={campaign.milestones}
-              adminAddress={campaign.adminAddress}
+              adminAddress={campaign.admin}
             />
           )}
         </div>
