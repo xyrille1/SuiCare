@@ -406,6 +406,14 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       });
       return;
     }
+    if (currentAccount.address.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+      toast({
+        title: "Unauthorized",
+        description: "Only the configured admin address can update campaigns.",
+        variant: "destructive",
+      });
+      return;
+    }
     const txb = new TransactionBlock();
     txb.setSender(currentAccount.address);
     txb.setGasBudget(10_000_000);
@@ -479,9 +487,37 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       });
       return;
     }
+    if (currentAccount.address.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+      toast({
+        title: "Unauthorized",
+        description: "Only the configured admin address can delete campaigns.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const campaign = campaigns.find((item) => item.id === campaignId);
+    if (
+      campaign &&
+      campaign.admin.toLowerCase() !== currentAccount.address.toLowerCase()
+    ) {
+      toast({
+        title: "On-chain Admin Mismatch",
+        description:
+          "This campaign can only be deleted by its original on-chain admin address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const txb = new TransactionBlock();
     txb.setSender(currentAccount.address);
     txb.setGasBudget(10_000_000);
+
+    txb.moveCall({
+      target: `${SUI_PACKAGE_ID}::sui_care::emergency_refund`,
+      arguments: [txb.object(SUI_CAMPAIGNS_ID), txb.pure.address(campaignId)],
+    });
 
     txb.moveCall({
       target: `${SUI_PACKAGE_ID}::sui_care::delete_campaign`,
@@ -515,7 +551,11 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
               title: "Campaign Deleted",
               description: `Transaction: ${result.digest}`,
             });
+            setCampaigns((prev) =>
+              prev.filter((campaign) => campaign.id !== campaignId),
+            );
             fetchCampaigns();
+            router.refresh();
             if (onSuccess) onSuccess();
           },
           onError: (error) => {

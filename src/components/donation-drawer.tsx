@@ -30,7 +30,7 @@ import {
   RequestReleaseButton,
   AdminVerificationPanel,
 } from "./milestone-components";
-import { useCampaigns } from "@/context/campaign-context";
+import { ADMIN_ADDRESS, useCampaigns } from "@/context/campaign-context";
 import { Campaign } from "@/lib/types";
 import { getDonationSuggestions } from "@/app/actions";
 import { getCampaignStatus } from "@/lib/campaign-status";
@@ -227,7 +227,8 @@ export function DonationDrawer({
               })}
             </div>
           )}
-          {currentAccount?.address === campaign.admin && (
+          {currentAccount?.address?.toLowerCase() ===
+            ADMIN_ADDRESS.toLowerCase() && (
             <AdminVerificationPanel
               campaignId={campaign.id}
               milestones={campaign.milestones}

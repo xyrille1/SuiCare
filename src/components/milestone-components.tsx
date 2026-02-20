@@ -1,14 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSignAndExecuteTransactionBlock } from "@mysten/dapp-kit";
+import {
+  useCurrentAccount,
+  useSignAndExecuteTransactionBlock,
+} from "@mysten/dapp-kit";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { CheckCircle2, Circle, Clock, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Milestone } from "@/lib/types";
-import { SUI_PACKAGE_ID, SUI_CAMPAIGNS_ID } from "@/context/campaign-context";
+import {
+  SUI_PACKAGE_ID,
+  SUI_CAMPAIGNS_ID,
+  ADMIN_ADDRESS,
+} from "@/context/campaign-context";
 import { useCampaigns } from "@/context/campaign-context";
 
 // MilestoneProgressDisplay Component
@@ -172,10 +179,13 @@ export function AdminVerificationPanel({
   milestones,
   adminAddress,
 }: AdminVerificationPanelProps) {
+  const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute, isPending } =
     useSignAndExecuteTransactionBlock();
   const { toast } = useToast();
   const { refetchCampaigns } = useCampaigns();
+  const isConfiguredAdmin =
+    currentAccount?.address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
   const requestedMilestones = useMemo(() => {
     return milestones
@@ -184,6 +194,15 @@ export function AdminVerificationPanel({
   }, [milestones]);
 
   const handleVerification = (milestoneIndex: number) => {
+    if (!isConfiguredAdmin) {
+      toast({
+        title: "Unauthorized",
+        description: "Only the configured admin address can verify milestones.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const txb = new TransactionBlock();
     txb.moveCall({
       target: `${SUI_PACKAGE_ID}::sui_care::verify_and_release`,
@@ -219,6 +238,10 @@ export function AdminVerificationPanel({
     return null; // Don't show the panel if no milestones are pending verification
   }
 
+  if (!isConfiguredAdmin) {
+    return null;
+  }
+
   return (
     <div className="mt-8 p-4 border-l-4 border-primary bg-primary/10">
       <h3 className="font-bold mb-4">Admin Verification</h3>
@@ -238,7 +261,7 @@ export function AdminVerificationPanel({
             </div>
             <Button
               onClick={() => handleVerification(m.index)}
-              disabled={isPending}
+              disabled={isPending || !isConfiguredAdmin}
               size="sm"
             >
               {isPending ? (

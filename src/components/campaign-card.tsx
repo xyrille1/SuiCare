@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Pencil, Trash2, AlertCircle } from "lucide-react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import { useCampaigns } from "@/context/campaign-context";
+import { ADMIN_ADDRESS, useCampaigns } from "@/context/campaign-context";
 import { Campaign } from "@/lib/types";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -50,16 +50,11 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   const currentAccount = useCurrentAccount();
   const { deleteCampaign, isPending } = useCampaigns();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // --- LOGIC ---
   // 1. Check if current user is the admin
   const isCampaignAdmin =
-    isClient && currentAccount?.address === campaign.admin;
+    currentAccount?.address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
   // 2. Check logic constraints
   const canEdit = campaign.totalReleased === 0;
@@ -90,8 +85,6 @@ export function CampaignCard({ campaign, onClick }: CampaignCardProps) {
       : status === "Funded"
         ? "secondary"
         : "outline";
-
-  if (!isClient) return null;
 
   return (
     <>
